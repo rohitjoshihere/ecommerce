@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 11, 2024 at 10:53 AM
+-- Generation Time: Oct 13, 2024 at 08:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 7.2.5
 
@@ -188,7 +188,8 @@ CREATE TABLE `delivery_partners` (
 
 INSERT INTO `delivery_partners` (`id`, `name`, `phone_number`, `vehicle_number`, `availability`, `address`, `created_at`, `updated_at`) VALUES
 (6, 'test', '88879 26670', 'UP32 AB 1234', 'active', 'testing', '2024-10-10 04:10:43', '2024-10-10 05:12:53'),
-(7, 'test', '88879 26670', 'UP32 NM 1563', 'inactive', 'sasas', '2024-10-10 04:11:11', '2024-10-10 05:12:13');
+(7, 'test222', '88879 26670', 'UP32 NM 1563', 'active', 'sasas', '2024-10-10 04:11:11', '2024-10-13 07:54:16'),
+(8, 'Harsh', '8887926670', '5565asdada656565', 'active', NULL, '2024-10-13 07:54:03', '2024-10-13 07:54:03');
 
 -- --------------------------------------------------------
 
@@ -349,7 +350,7 @@ CREATE TABLE `orders` (
   `quantity` int(11) NOT NULL,
   `payment_method` enum('cod','paypal','cardpay') NOT NULL DEFAULT 'cod',
   `payment_status` enum('paid','unpaid') NOT NULL DEFAULT 'unpaid',
-  `status` enum('new','process','delivered','cancel') NOT NULL DEFAULT 'new',
+  `status` enum('new','pending','delivered','cancel') NOT NULL DEFAULT 'new',
   `first_name` varchar(191) NOT NULL,
   `last_name` varchar(191) NOT NULL,
   `email` varchar(191) NOT NULL,
@@ -367,7 +368,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `delivery_partner_id`, `order_number`, `user_id`, `sub_total`, `shipping_id`, `coupon`, `total_amount`, `quantity`, `payment_method`, `payment_status`, `status`, `first_name`, `last_name`, `email`, `phone`, `country`, `post_code`, `address1`, `address2`, `created_at`, `updated_at`) VALUES
-(12, 6, 'ORD-LJHHN1ZUFO', 2, 64.00, 1, NULL, 76.00, 2, 'cod', 'unpaid', 'new', 'Rohit', 'Joshi', 'admin@gmail.com', '9044834261', 'BZ', '226016', 'E 109 Kurmanchal Nagar Lucknow', NULL, '2024-10-08 05:41:46', '2024-10-08 05:41:46');
+(12, 8, 'ORD-LJHHN1ZUFO', 2, 64.00, 1, NULL, 76.00, 2, 'cod', 'unpaid', 'pending', 'Rohit', 'Joshi', 'admin@gmail.com', '9044834261', 'BZ', '226016', 'E 109 Kurmanchal Nagar Lucknow', NULL, '2024-10-08 05:41:46', '2024-10-13 11:17:04');
 
 -- --------------------------------------------------------
 
@@ -855,7 +856,7 @@ ALTER TABLE `coupons`
 -- AUTO_INCREMENT for table `delivery_partners`
 --
 ALTER TABLE `delivery_partners`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
