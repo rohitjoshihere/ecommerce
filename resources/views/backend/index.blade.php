@@ -2,12 +2,96 @@
 @section('title','Ecommerce Laravel || DASHBOARD')
 @section('main-content')
 <div class="container-fluid">
-  @include('backend.layouts.notification')
   <!-- Page Heading -->
   <!-- Visit 'codeastro' for more projects -->
   <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
   </div>
+
+  <div class="card shadow mb-4">
+    <div class="row">
+      <div class="col-md-12">
+        @include('backend.layouts.notification')
+      </div>
+    </div>
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary float-left">Order Lists</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        @if($orders->count() > 0)
+        <table class="table table-bordered table-hover" id="order-dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Order No.</th>
+              <th>Name</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($orders as $order)
+            <tr>
+              <td>{{ $order->id }}</td>
+              <td><a href="{{ route('order.show', $order->id) }}">{{ $order->order_number }}</a></td>
+              <td>{{ $order->first_name }} {{ $order->last_name }}</td>
+              <td>${{ number_format($order->total_amount, 2) }}</td>
+              <td>
+                <button class="bg-success text-white btn" type="button" data-bs-toggle="modal"
+                  data-bs-target="#acceptModal-{{ $order->id }}">
+                  Accept
+                </button>
+                <form action="{{ route('orders.decline', $order->id) }}" method="POST" style="display: inline;">
+                  @csrf
+                  <button type="submit" class="bg-danger text-white btn">Decline</button>
+                </form>
+              </td>
+            </tr>
+
+            <!-- Accept Modal for each order -->
+            <div class="modal fade" id="acceptModal-{{ $order->id }}" tabindex="-1"
+              aria-labelledby="acceptModalLabel-{{ $order->id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title fw-semibold" id="acceptModalLabel-{{ $order->id }}">Select Delivery Partner
+                    </h4>
+                   </div>
+                  <div class="modal-body">
+                    <form action="{{ route('orders.accept', $order->id) }}" method="POST">
+                      @csrf
+                      <div class="form-group">
+                        <label for="delivery_partner_id">Delivery Partner</label>
+                        <select name="delivery_partner_id" class="form-control" required>
+                          <option value="">Select Delivery Partner</option>
+                          @foreach($deliveryPartners as $partner)
+                          <option value="{{ $partner->id }}">{{ $partner->name }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @endforeach
+          </tbody>
+        </table>
+        <div class="d-flex justify-content-end">
+          {{ $orders->links() }}
+        </div>
+        @else
+        <h6 class="text-center">No orders found! Please order some products.</h6>
+        @endif
+      </div>
+    </div>
+  </div>
+
 
   <!-- Content Row -->
   {{-- <div class="row">
@@ -212,158 +296,3 @@
     <!-- Visit 'codeastro' for more projects -->
   </div>
   @endsection
-
-  @push('scripts')
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  {{-- pie chart --}}
-  <script type="text/javascript">
-    var analytics = <?php echo $users; ?>
-
-  google.charts.load('current', {'packages':['corechart']});
-  google.charts.setOnLoadCallback(drawChart);
-
-  function drawChart()
-  {
-      var data = google.visualization.arrayToDataTable(analytics);
-      var options = {
-          title : 'Last 7 Days registered user'
-      };
-      var chart = new google.visualization.PieChart(document.getElementById('pie_chart'));
-      chart.draw(data, options);
-  }
-  </script>
-  {{-- line chart --}}
-  <script type="text/javascript">
-    const url = "{{route('product.order.income')}}";
-    // Set new default font family and font color to mimic Bootstrap's default styling
-    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
-
-    function number_format(number, decimals, dec_point, thousands_sep) {
-      // *     example: number_format(1234.56, 2, ',', ' ');
-      // *     return: '1 234,56'
-      number = (number + '').replace(',', '').replace(' ', '');
-      var n = !isFinite(+number) ? 0 : +number,
-        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
-        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
-        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
-        s = '',
-        toFixedFix = function(n, prec) {
-          var k = Math.pow(10, prec);
-          return '' + Math.round(n * k) / k;
-        };
-      // Fix for IE parseFloat(0.55).toFixed(0) = 0;
-      s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
-      if (s[0].length > 3) {
-        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-      }
-      if ((s[1] || '').length < prec) {
-        s[1] = s[1] || '';
-        s[1] += new Array(prec - s[1].length + 1).join('0');
-      }
-      return s.join(dec);
-    }
-
-      // Area Chart Example
-      var ctx = document.getElementById("myAreaChart");
-
-        axios.get(url)
-              .then(function (response) {
-                const data_keys = Object.keys(response.data);
-                const data_values = Object.values(response.data);
-                var myLineChart = new Chart(ctx, {
-                  type: 'line',
-                  data: {
-                    labels: data_keys, // ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                    datasets: [{
-                      label: "Earnings",
-                      lineTension: 0.3,
-                      backgroundColor: "rgba(78, 115, 223, 0.05)",
-                      borderColor: "rgba(78, 115, 223, 1)",
-                      pointRadius: 3,
-                      pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                      pointBorderColor: "rgba(78, 115, 223, 1)",
-                      pointHoverRadius: 3,
-                      pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                      pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                      pointHitRadius: 10,
-                      pointBorderWidth: 2,
-                      data:data_values,// [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
-                    }],
-                  },
-                  options: {
-                    maintainAspectRatio: false,
-                    layout: {
-                      padding: {
-                        left: 10,
-                        right: 25,
-                        top: 25,
-                        bottom: 0
-                      }
-                    },
-                    scales: {
-                      xAxes: [{
-                        time: {
-                          unit: 'date'
-                        },
-                        gridLines: {
-                          display: false,
-                          drawBorder: false
-                        },
-                        ticks: {
-                          maxTicksLimit: 7
-                        }
-                      }],
-                      yAxes: [{
-                        ticks: {
-                          maxTicksLimit: 5,
-                          padding: 10,
-                          // Include a dollar sign in the ticks
-                          callback: function(value, index, values) {
-                            return '$' + number_format(value);
-                          }
-                        },
-                        gridLines: {
-                          color: "rgb(234, 236, 244)",
-                          zeroLineColor: "rgb(234, 236, 244)",
-                          drawBorder: false,
-                          borderDash: [2],
-                          zeroLineBorderDash: [2]
-                        }
-                      }],
-                    },
-                    legend: {
-                      display: false
-                    },
-                    tooltips: {
-                      backgroundColor: "rgb(255,255,255)",
-                      bodyFontColor: "#858796",
-                      titleMarginBottom: 10,
-                      titleFontColor: '#6e707e',
-                      titleFontSize: 14,
-                      borderColor: '#dddfeb',
-                      borderWidth: 1,
-                      xPadding: 15,
-                      yPadding: 15,
-                      displayColors: false,
-                      intersect: false,
-                      mode: 'index',
-                      caretPadding: 10,
-                      callbacks: {
-                        label: function(tooltipItem, chart) {
-                          var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                          return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
-                        }
-                      }
-                    }
-                  }
-                });
-              })
-              .catch(function (error) {
-              //   vm.answer = 'Error! Could not reach the API. ' + error
-              console.log(error)
-              });
-
-  </script>
-  @endpush

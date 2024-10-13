@@ -117,9 +117,9 @@
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header">Order Options:</h6>
         <a class="collapse-item" href="{{route('order.index')}}">All Orders</a>
-        <a class="collapse-item" href="{{route('shipping.create')}}">Pending Orders</a>
-        <a class="collapse-item" href="{{route('shipping.create')}}">Completed Orders</a>
-        <a class="collapse-item" href="{{route('shipping.create')}}">Declined Orders</a>
+        <a class="collapse-item" href="{{route('orders.pending')}}">Pending Orders</a>
+        <a class="collapse-item" href="{{route('orders.delivered')}}">Delivered Orders</a>
+        <a class="collapse-item" href="{{route('orders.cancel')}}">Cancelled Orders</a>
       </div>
     </div>
   </li>
